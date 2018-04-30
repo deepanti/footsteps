@@ -1,0 +1,120 @@
+
+
+<%= render 'sadhna_cards/header' %>
+
+<% if current_user == @user || current_user.role == 'admin' %>
+
+	<div class="container">
+
+    <h3><%= current_user.name %> Sadhna Details %></h3>
+
+	  <ul class="sc_list list-group">
+	    <label><%= @month_name %> - <%= @year %> Sadhna</label>
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Sadhna Cards
+	          </td>
+	          <td>
+	            <%= @current_month_sadhna_cards %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Japa Rounds
+	          </td>
+	          <td>
+	            <%= @current_month_rounds %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Reading Hours
+	          </td>
+	          <td>
+	            <%= @current_month_reading_hours %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Hearing Hours
+	          </td>
+	          <td>
+	            <%= @current_month_hearing_hours %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Service Hours
+	          </td>
+	          <td>
+	            <%= @current_month_service_hours %>
+	          </td>
+	        </table>
+	      </li>        
+	  </ul>
+
+	  <ul class="sc_list list-group">
+	    <label>All Time Sadhna</label>
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Sadhna Cards
+	          </td>
+	          <td>
+	            <%= @total_sadhna_cards %>
+	          </td>
+	        </table>
+	      </li>
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Japa Rounds
+	          </td>
+	          <td>
+	            <%= @total_rounds %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Reading Hours
+	          </td>
+	          <td>
+	            <%= @total_reading_hours %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Hearing Hours
+	          </td>
+	          <td>
+	            <%= @total_hearing_hours %>
+	          </td>
+	        </table>
+	      </li>        
+	      <li class="list-group-item">
+	        <table>
+	          <td>
+	            Service Hours
+	          </td>
+	          <td>
+	            <%= @total_service_hours %>
+	          </td>
+	        </table>
+	      </li>        
+	  </ul>
+
+	</div>
+<% end %>

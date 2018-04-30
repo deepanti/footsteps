@@ -1,0 +1,26 @@
+
+@media (min-width:320px) {
+	.login {
+		margin-top: -20px;
+		background-image: url("../images/srila-prabhupada-japa-bw-380x500.jpg");
+		background-repeat: no-repeat;
+		color: white;
+		background-size: cover;
+		form {
+			margin-left: 65px;
+		}
+	}
+}
+
+@media (min-width:961px) {
+	.login {
+		margin-top: -20px;
+		background-image: url("../images/srila-prabhupada-japa-bw-380x500.jpg");
+		background-repeat: no-repeat;
+		color: white;
+	}
+}
+
+.new_account {
+  margin-left: 80px;
+}

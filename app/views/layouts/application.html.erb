@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Footsteps</title>
+  <title>Sadhana Cards</title>
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
-</head>
+
+  </head>
+
 <body>
+
+<% if flash[:error].present? %>
+        <div class="fade alert alert-danger fade in">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          <%= flash[:error] %>
+        </div>
+      <%end%>
+      
 
 <%= yield %>
 

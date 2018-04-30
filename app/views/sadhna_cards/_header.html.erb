@@ -1,13 +1,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="/sadhna_cards">Sadhna Cards</a>
+  <div class="container">
+    <div class="header navbar-header">
+      <a class="navbar-brand" href="/sadhna_cards">Sadhana Cards</a>
+      <% if current_user.present? %>
+        
+        <span class="user-menu dropdown">
+          
+          <span class="glyphicon glyphicon-align-justify dropdown-toggle" id="dropdownMenuButton" aria-haspopup="true" aria-expanded="false">
+          </span>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="/users_account">
+             Account <span class="glyphicon glyphicon-user"></span>
+            </a>
+            <a class="dropdown-item" href="/users">
+             Stats <span class="glyphicon glyphicon-signal"></span>
+            </a>
+            <a class="dropdown-item" href="/badges">
+             Badges<span class="glyphicon glyphicon-star"></span>
+            </a>
+            <hr>
+            <a class="dropdown-item logout" href="/logout">
+             Logout<span class="glyphicon glyphicon-off"></span>
+            </a>
+          </div>
+        </span>
+        
+      <% end %>
     </div>
-    <!-- <ul class="nav navbar-nav">
-      <li class="active"><a href="/">Today</a></li>
-      <li><a href="#">Yesterday</a></li>
-      <li><a href="#">Other Days</a></li>
-    </ul> -->
+    
   </div>
 </nav>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $(".dropdown-toggle").click(function(e){
+      $('.user-menu').find(".dropdown-menu").toggle()
+    });
+
+  })
+
+</script>
+
+<style type="text/css">
+/*  .user-menu.dropdown:hover > .dropdown-menu {
+    display: block;    
+  }
+  @media (min-width: 979px) {
+    .user-menu.dropdown:hover > .dropdown-menu {
+      display: block;    
+    }
+  }*/
+
+  .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: .25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+  }
+
+  .user-menu {
+    float: right;
+    padding: 15px 0px;
+    font-size: 18px;
+    line-height: 20px;
+    height: 50px;
+
+  }
+
+  .user-menu .dropdown-menu {
+    left: -112px;
+    min-width: 160px;
+    font-size: 16px;
+  }
+
+  .logout {
+    margin-top: 0px !important;
+  }
+
+
+  .user-menu .dropdown-item {
+    text-decoration: none;
+    color: #333333;
+    margin-top: 15px;
+  }
+
+  .user-menu .glyphicon {
+    float: right;
+  }
+
+</style>

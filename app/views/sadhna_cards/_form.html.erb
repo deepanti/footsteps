@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container">
   <%= form_tag model: @sadhna_card do %>
 
      <% if @sadhna_card.errors.any? %>
@@ -17,9 +17,9 @@
 
     <label>Date</label>
     <% if @sadhna_card.id.present? %>
-      <input type="date" value="<%= @sadhna_card.date %>" id="date"></input>
+      <input type="date" max="<%= today_date %>" required value="<%= @sadhna_card.date %>" id="date"></input>
     <% else %>
-      <input type="date" value="<%= Time.zone.now.to_date %>" id="date"></input>
+      <input type="date" max="<%= today_date %>" required value="<%= Time.zone.now.to_date %>" id="date"></input>
     <% end %>
 
     <br>
@@ -28,31 +28,47 @@
     <form class="form-inline">
       <div class="form-group">
         <label for="japa_rounds">Japa rounds</label>
-        <input type="number" class="form-control" id="japa_rounds" value="<%= @sadhna_card.japa_rounds %>">
+        <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="japa_rounds" value="<%= @sadhna_card.japa_rounds %>">
       </div>
     </form>
 
     <div class="form-group">
       <label for="reading">Reading</label>
+      <select class="form-control" id="reading_book">
+        <option value="">Select book</option>
+        <% books.each do |book| %>
+          <% if @sadhna_card.reading_book == book %>
+            <option selected value="<%=book%>"><%= book %></option>
+          <% else %>
+            <option value="<%=book%>"><%= book %></option>  
+          <% end %>
+        <% end %>
+      </select>
       <table class="row">
         <td class="first_column">
-          <input type="number" class="form-control" id="reading" value="<%= @sadhna_card.reading %>">
+          <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="reading" value="<%= @sadhna_card.reading %>">
         </td>
         <td class="second_column">
           <!-- <input type="text" readonly value=""> -->
           <select class="form-control" id="reading_type">
-            <option value="Mins">Mins</option>
-            <option value="Hrs">Hrs</option>
+            <% reading_types.each do |type| %>
+              <% if @sadhna_card.reading_type == type %>
+                <option selected value="<%=type%>"><%= type %></option>
+              <% else %>
+                <option value="<%=type%>"><%= type %></option>
+              <% end %>
+            <% end %>
           </select>
         </td>
       </table>
+
     </div>
 
     <div class="form-group">
       <label for="hearing">Hearing</label>
       <table class="row">
         <td class="first_column">
-          <input type="number" class="form-control" id="hearing" value="<%= @sadhna_card.hearing %>">
+          <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="hearing" value="<%= @sadhna_card.hearing %>">
         </td>
         <td class="second_column">
           <!-- <input type="text" readonly value=""> -->
@@ -66,23 +82,44 @@
 
     <div class="form-group">
       <label for="service">Service</label>
-      <table class="row">
-        <td class="first_column">
-          <input type="number" class="form-control" id="service" value="<%= @sadhna_card.service %>">
-        </td>
-        <td class="second_column">
-          <!-- <input type="text" readonly value=""> -->
-          <select class="form-control" id="service_type">
-            <option value="Mins">Mins</option>
-            <option value="Hrs">Hrs</option>
-          </select>
-        </td>
+      <table>
+        <tr>
+          <td class="first_column">
+            <input type="number" min="0" oninput="validity.valid||(value='');" class="form-control" id="service" value="<%= @sadhna_card.service %>">
+          </td>
+          <td class="second_column">
+            <select class="form-control" id="service_type">
+              <option value="Mins">Mins</option>
+              <option value="Hrs">Hrs</option>
+            </select>
+          </td>
+        </tr>
       </table>
+
+      <% if @sadhna_card.service_text.present? %>
+        <input placeholder="Service rendered" class="form-control" id="service_text" value="<%= @sadhna_card.service_text %>">
+      <% else %>
+        <input placeholder="Service rendered" class="form-control" id="service_text">
+      <% end %>
+      
     </div>
 
     <div class="form-group">
-      <label for="chad">CHAD</label>
-      <input type="text" class="form-control" id="chad" value="<%= @sadhna_card.chad %>">
+      <table class="row">
+        <td class="first_column">
+          <label for="chad">CHAD</label>
+          <select class="form-control" id="chad">
+            <option value="0">Select Chapter</option>
+            <% chad_map.each do |ch| %>
+              <% if @sadhna_card.chad == ch[0] %>
+                <option selected value="<%= ch[0] %>"><%= ch[1] %></option>
+              <% else %>
+                <option value="<%= ch[0] %>"><%= ch[1] %></option>
+              <% end %>
+            <% end %>
+          </select>
+        </td>
+      </table>
     </div>
     <div class="form-group">
       <label for="wake_up">Wake Up</label>
@@ -100,6 +137,113 @@
           <input type="time" class=" form-control" id="slept_at">
       <% end %>
     </div>
+    <div class="form-group">
+      <textarea placeholder="Comments (optional)" class=" form-control" id="comments"><%= @sadhna_card.comments %></textarea>
+    </div>
 
   <% end %>
 </div>
+
+<style type="text/css">
+  #service_text {
+    margin-top: -10px;
+  }
+
+  #reading_book {
+    margin-bottom: 10px;
+  }
+
+</style>
+
+<script type="text/javascript">
+  
+$(document).ready(function(){
+  $('.timepicker').timepicker()
+  $('#save_card').click(function(e){
+    data = {
+      rounds: $("#japa_rounds").val(),
+
+    }
+  });
+
+  $("#update").click(function(e){
+
+    if (!$('input#date').val()) {
+      alert("Date can't be empty")
+      return
+    }
+
+    data = {
+      date: $('input#date').val(),
+      japa_rounds: $('input#japa_rounds').val(),
+      service: $('input#service').val(),
+      hearing: $('input#hearing').val(),
+      reading: $('input#reading').val(),
+      service_type: $('#service_type').val(),
+      hearing_type: $('#hearing_type').val(),
+      reading_type: $('#reading_type').val(),
+      service_text: $('#service_text').val(),
+      reading_book: $('#reading_book').val(),
+      comments: $('#comments').val(),
+      chad: $('#chad').val(),
+      wake_up: $('input#wake_up').val(),
+      slept_at: $('input#slept_at').val(),
+      id: $("div#sc_id").text()
+    }
+
+
+    $.ajax({
+      url: "/sadhna_cards/" + data.id, 
+      method: "put",
+      data: data,
+      success: function(data){
+        window.location.href = "/sadhna_cards/" + data.id
+      },
+      failure: function(e){
+        alert(e)
+      }
+    });
+
+  })
+
+  $('#create').click(function(e){
+
+    if (!$('input#date').val()) {
+      alert("Date can't be empty")
+      return
+    }
+    
+    data = {
+      date: $('input#date').val(),
+      japa_rounds: $('input#japa_rounds').val(),
+      service: $('input#service').val(),
+      hearing: $('input#hearing').val(),
+      reading: $('input#reading').val(),
+      chad: $('#chad').val(),
+      service_type: $('#service_type').val(),
+      hearing_type: $('#hearing_type').val(),
+      reading_type: $('#reading_type').val(),
+      service_text: $('#service_text').val(),
+      reading_book: $('#reading_book').val(),
+      comments: $('#comments').val(),
+      wake_up: $('input#wake_up').val(),
+      slept_at: $('input#slept_at').val()
+    }
+
+    $.ajax({
+      url: "/sadhna_cards", 
+      method: "post",
+      data: data,
+      success: function(data){
+        window.location.href = "/sadhna_cards/" + data.id
+      },
+      error: function(e){
+        alert(e.responseJSON.error)
+      }
+    });
+
+  })
+
+});
+
+</script>

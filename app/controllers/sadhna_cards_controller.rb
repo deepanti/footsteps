@@ -1,4 +1,5 @@
 class SadhnaCardsController < ApplicationController
+  include SadhnaCardHelper
 
   def new
     @sadhna_card = SadhnaCard.new
@@ -6,7 +7,7 @@ class SadhnaCardsController < ApplicationController
     @custom_path = "/sadhna_cards"
   end  
 
-  def index
+  def download
     if params[:month].present? and params[:year].present?
       @month = params[:month]
       @year = params[:year]
@@ -15,7 +16,69 @@ class SadhnaCardsController < ApplicationController
       @year =  Date.today.strftime("%Y")
     end
 
-    @sadhna_cards = SadhnaCard.where('extract(year  from date) = ? AND extract(month  from date) = ? 
+    valid_columns = {
+      "date" => "Date", 
+      "japa_rounds" => "Japa Rounds", 
+      "reading" => "Reading Time",
+      "reading_book" => "Book Read",
+      "chad" => "CHAD (Chapter A Day)",
+      "wakeup" => "Wake Up time", 
+      "rest_time" => "Rest time", 
+      "hearing" => "Hearing Time", 
+      "service" => "Seva time",
+      "service_text" => "Service executed",
+      "comments" => "Comments"
+    }
+
+    @sadhna_cards = current_user.sadhna_cards.where('extract(year  from date) = ? AND extract(month  from date) = ? 
+      ', @year, @month).order(date: :desc)
+
+    filename = "sadhna_" + current_user.id.to_s + "_" + @month.to_s + "_" + @year.to_s + ".csv"
+    CSV.open(filename, "wb") do |csv|
+      csv << valid_columns.values
+      @sadhna_cards.each do |sc|
+        values = []
+        valid_columns.keys.each do |col|
+          v = sc[col]
+          if col == "reading"
+            v = 0 if !v
+            type = if sc.reading_type.present? then sc.reading_type else "mins" end
+            values.push(v + " " + type)
+          elsif col == "hearing" || col == "service"
+            v = 0 if !v
+            values.push(v + " mins")
+          elsif col == "rest_time" || col == "wakeup"
+            if v
+              values.push(v.strftime("%I:%M%p"))
+            else
+              values.push(nil)
+            end
+          elsif col == "chad"
+            values.push(get_chapter(v))
+          else
+            values.push(v)
+          end
+
+        end
+
+        csv << values
+      end
+    end
+
+    send_file filename, :disposition => 'attachment'
+  end
+
+  def index
+
+    if params[:month].present? and params[:year].present?
+      @month = params[:month]
+      @year = params[:year]
+    else
+      @month = Date.today.strftime("%m")
+      @year =  Date.today.strftime("%Y")
+    end
+
+    @sadhna_cards = current_user.sadhna_cards.where('extract(year  from date) = ? AND extract(month  from date) = ? 
       ', @year, @month).order(date: :desc)
 
     @months = [["01", "Jan"], ["02", "Feb"], ["03", "March"], ["04", "April"], 
@@ -26,18 +89,25 @@ class SadhnaCardsController < ApplicationController
     start = 1989
     while count < 50
       count += 1
-      @years.push(start + count)
+      if start+count <= @year.to_i
+        @years.push(start + count)
+      end
     end
 
   end
 
   def create
-    @sadhna_card = SadhnaCard.new(sadhna_card_params)
- 
-    if @sadhna_card.save
-      render :json => {id: @sadhna_card.id}, :status => :ok
+    existing_sc = SadhnaCard.where(:date => params[:date], :user_id => current_user.id)
+    if existing_sc.count > 0
+      render :json => {:error => "Sadhana Card with this date exists"}, :status => 422
     else
-      render 'new'
+      @sadhna_card = SadhnaCard.new(sadhna_card_params)
+   
+      if @sadhna_card.save
+        render :json => {id: @sadhna_card.id}, :status => :ok
+      else
+        render 'new'
+      end
     end
   end
 
@@ -64,6 +134,28 @@ class SadhnaCardsController < ApplicationController
   private
 
   def sadhna_card_update_params
+    unless params[:hearing].present?
+      params[:hearing] = 0
+    end
+    unless params[:reading].present?
+      params[:reading] = 0
+    end
+    unless params[:service].present?
+      params[:service] = 0
+    end
+    unless params[:japa_rounds].present?
+      params[:japa_rounds] = 0
+    end
+    unless params[:chad].present?
+      params[:chad] = 0
+      params[:verses] = 0
+    else
+      params[:verses] = get_verses(params[:chad])
+    end
+    if params[:reading_type] == "Hrs"
+      params[:reading] = params[:reading].to_i*60
+      params[:reading_type] == "Mins"
+    end
     { 
       :date => params[:date],
       :japa_rounds => params[:japa_rounds], 
@@ -72,11 +164,50 @@ class SadhnaCardsController < ApplicationController
       :rest_time => params[:slept_at],
       :service => if params[:service_type] == "Mins" then params[:service] else params[:service].to_i*60 end, 
       :chad => params[:chad], 
-      :reading => if params[:reading_type] == "Mins" then params[:reading] else params[:reading].to_i*60 end, 
+      :verses => params[:verses], 
+      :reading => params[:reading],
+      :reading_type => params[:reading_type],
+      :service_text => params[:service_text],
+      :comments => params[:comments],
+      :reading_book => params[:reading_book],
     }
   end
 
+  def get_verses(chapter_value)
+    chad_map.each do |ch|
+      if ch[0] == chapter_value
+        return ch[2]
+      end
+    end
+    return 0
+  end
+
   def sadhna_card_params
+    unless params[:hearing].present?
+      params[:hearing] = 0
+    end
+    unless params[:reading].present?
+      params[:reading] = 0
+    end
+    unless params[:service].present?
+      params[:service] = 0
+    end
+    unless params[:japa_rounds].present?
+      params[:japa_rounds] = 0
+    end
+    unless params[:chad].present?
+      params[:chad] = 0
+    end
+    unless params[:chad].present?
+      params[:chad] = 0
+      params[:verses] = 0
+    else
+      params[:verses] = get_verses(params[:chad])
+    end
+    if params[:reading_type] == "Hrs"
+      params[:reading] = params[:reading].to_i*60
+      params[:reading_type] == "Mins"
+    end
     { 
       :date => params[:date],
       :japa_rounds => params[:japa_rounds], 
@@ -85,7 +216,13 @@ class SadhnaCardsController < ApplicationController
       :rest_time => params[:slept_at],
       :service => params[:service_type] == "Mins" ? params[:service] : params[:service].to_i*60, 
       :chad => params[:chad], 
-      :reading => params[:reading_type] == "Mins" ? params[:reading] : params[:reading].to_i*60
+      :verses => params[:verses], 
+      :reading => params[:reading],
+      :reading_type => params[:reading_type],
+      :user_id => current_user.id,
+      :service_text => params[:service_text],
+      :comments => params[:comments],
+      :reading_book => params[:reading_book],
     }
   end
 end

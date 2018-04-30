@@ -1,0 +1,186 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+
+<!-- <head>
+  <hr>
+  <div class="container">
+    <button id="save" class="btn btn-primary">Save as PDF</button>
+  </div>
+  <hr>
+</head> -->
+
+<body>
+<div class="container">
+
+<img class="img" src="/images/Krishna_in_Vraja_1-3-2.jpg">
+
+<h4 class="center"> He who is regulated in his habits of eating, sleeping, recreation and work can mitigate all material pains by practicing the yoga system. (BG 6.17) </h4>
+
+
+<div class="title">Sādhanā Card</div>
+<div class="sc_header">
+  <div class="flex">
+    <span class="table-header">Name: <%= current_user.name %> </span>
+    <span class="table-header">Month/Year: <%= @month %> / <%= @year %> </span>
+  </div>
+
+  <% @sadhna_cards.each_slice(7).to_a.each do |cards| %>
+
+    <div class="flex">
+      <span class="name1-header"></span>
+      <% cards.each do |c| %>
+        <span class="cell-header"><%= c.date %> </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">Wake Up Time
+      <div>(Jīva Jāgo)</div>
+      </span>
+      <% cards.each do |c| %>
+        <span class="cell"><%= if c.wakeup then c.wakeup.strftime("%I:%M%p") else nil end %> </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">Japa 
+        <div>(Number of Rounds)</div></span>
+      <% cards.each do |c| %>
+        <span class="cell"><%= c.japa_rounds %> </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">Reading
+        <div> (Number of pages or minutes) </div></span>
+      <% cards.each do |c| %>
+        <span class="cell">
+          <%= ret = if c.reading_book.present? then c.reading_book + " " else "" end %>
+          <div>
+          <%=
+              ret = "("
+              ret += if c.reading.present? then c.reading + " " + if c.reading_type.present? then c.reading_type else "mins" end else nil end
+              ret += ")"
+              ret
+          %>
+          </div>
+        </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">CHAD</span>
+      <% cards.each do |c| %>
+        <span class="cell"><%= get_chapter(c.chad) %> </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">Services <div>(Time Engaged)</div></span>
+      <% cards.each do |c| %>
+        <span class="cell"><%= if c.service.present? then c.service + " mins" else "0 mins" end %> </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">Rest Time</span>
+      <% cards.each do |c| %>
+        <span class="cell"><%= if c.rest_time then c.rest_time.strftime("%I:%M%p") else nil end %> </span>
+      <% end %>
+    </div>
+
+    <div class="flex">
+      <span class="name1">Hearing <div>(Śravaṇa)</div></span>
+      <% cards.each do |c| %>
+        <span class="cell"><%= if c.hearing.present? then c.hearing + " mins" else "0 mins" end %> </span>
+      <% end %>
+    </div>
+
+  <% end %>
+  </div>
+
+
+</div>
+</body>
+
+<script type="text/javascript">
+  
+  let doc = new jsPDF('p','pt','a4');
+
+  doc.addHTML(document.body,function() {
+      doc.save('<%= "sadhana_card_#{@month}_#{@year}.pdf" %>');
+  });  
+
+  
+</script>
+
+<style type="text/css">
+  .center {
+    text-align: center;
+  }
+
+  .title {
+    background-color: red;
+    color: white;
+    height: 30px;
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .name1 {
+    width: 12.5%;
+    padding: 10px 10px 10px 10px;
+    border: 1.5px solid grey;
+    font-weight: bold;
+    background-color: #eaeaea;
+    color: blue;
+  }
+
+  .name1-header {
+    width: 12.5%;
+    padding: 10px 10px 10px 10px;
+    border: 1.5px solid grey;
+    background-color: #eaeaea;
+    font-weight: bold;
+    color: blue;
+  }
+
+  .cell-header {
+    width: 12.5%;
+    padding: 10px 10px 10px 10px;
+    border: 1.5px solid grey;
+    background-color: #eaeaea;
+    font-weight: bold;
+    color: blue;
+  }
+
+  .cell {
+    width: 12.5%;
+    padding: 10px 10px 10px 10px;
+    border: 1.5px solid grey;
+    font-weight: bold;
+  }
+
+
+  .table-header {
+    width: 50%;
+    padding: 10px 10px 10px 10px;
+    border: 1.5px solid grey;
+    background-color: #eaeaea;
+    font-weight: bold;
+  }
+
+  .flex {
+    display: flex;
+  }
+
+  .img {
+    width: 100%;
+  }
+
+  #save {
+    width: 100%
+  }
+
+</style>
+

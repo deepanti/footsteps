@@ -3,8 +3,13 @@ class User < ActiveRecord::Base
 	has_many :mentors, :class_name => 'User'
   has_many :positions
   has_many :recommendations
+  has_many :sadhna_cards
 
   include UsersHelper
+
+  def authenticate(val)
+    self.encrypted_password == val
+  end
 
   def self.create_user_from_linkedin(access_token)
     url = "https://api.linkedin.com/v1/people/"

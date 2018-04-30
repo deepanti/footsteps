@@ -18,7 +18,11 @@ Rails.application.routes.draw do
   resources :medias
   resources :announcements
 
-  resources :sadhna_cards
+  resources :sadhna_cards do
+    collection do
+      get :download
+    end
+  end
 
   scope '/recommender' do
     resources :recommendations do
@@ -34,8 +38,28 @@ Rails.application.routes.draw do
 
   resources :skills
 
+  get 'sessions/new'
+
+  get 'users/new'
+
+  get    'login'   => 'sessions#new'
+  post   'login'   => 'sessions#create'
+  delete 'logout'  => 'sessions#destroy'
+  get    'logout'  => 'sessions#destroy'
+
+  resources :users
+
   # You can have the root of your site routed with "root"
   root 'sadhna_cards#index'
+
+  post    'update_rounds'  => 'users#update_rounds'
+  get    '/users/:id/report'  => 'users#report'
+  get '/users_account' => 'users#edit'
+
+  post '/storeauthcode' => 'sessions#sign_in'
+
+  get '/badges' => 'users#badges'
+  get '/badges/:id' => 'users#badges'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

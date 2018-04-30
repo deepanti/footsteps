@@ -1,0 +1,60 @@
+<!-- <head>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+  </script>
+  <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+  </script>
+
+   <script>
+    function start() {
+      gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+          client_id: '592824816342-2thkfpovn8rd1rb2n4t14nqpiu1jr3pi.apps.googleusercontent.com',
+          // Scopes to request in addition to 'profile' and 'email'
+          //scope: 'additional_scope'
+        });
+      });
+    }
+
+    function signInCallback(authResult) {
+      if (authResult['code']) {
+
+        // Hide the sign-in button now that the user is authorized, for example:
+        $('#signinButton').attr('style', 'display: none');
+
+        // Send the code to the server
+        $.ajax({
+          type: 'POST',
+          url: '/storeauthcode',
+          // Always include an `X-Requested-With` header in every AJAX request,
+          // to protect against CSRF attacks.
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          contentType: 'application/octet-stream; charset=utf-8',
+          success: function(result) {
+            // Handle or verify the server response.
+            window.location.href = "/sadhna_card"
+          },
+          processData: false,
+          data: authResult['code']
+        });
+      } else {
+        alert("Unable to sign in")
+      }
+    }
+  </script>
+
+
+
+</head>
+<body>
+
+<button id="signinButton">Sign in with Google</button>
+<script>
+  $('#signinButton').click(function() {
+    // signInCallback defined in step 6.
+    auth2.grantOfflineAccess().then(signInCallback);
+  });
+</script>
+
+</body> -->

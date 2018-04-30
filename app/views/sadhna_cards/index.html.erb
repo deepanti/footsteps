@@ -9,15 +9,9 @@
   </head>
   <body>
 
-    <div class="container-fluid">
+    <div class="container">
 
       <!-- Content here -->
-
-      <form class="" action="/sadhna_cards/new">
-        <button type="submit" class="btn btn-primary">Add Sadhna Card
-        </button>
-      </form>
-      <br>
 
       <div>
         <div class="form-group">
@@ -44,18 +38,30 @@
             <% end %>
           </select>
         </div>
-        <button id="load" class="btn btn-primary">Load</button>
+        <button id="load" class="btn btn-primary">Show</button>
+        <button id="download" class="btn btn-primary">Download</button>
+        <a id="download_link" download>Download Link</a>
+        <form class="add_new_sc" action="/sadhna_cards/new">
+          <button type="submit" class="btn btn-success">Add Sadhana Card
+          </button>
+        </form>
       </div>
 
+      <br>
+
       <ul class="sc_list list-group">
-        <% @sadhna_cards.each do |card| %>
-          <li class="list-group-item">
-            <form action="/sadhna_cards/<%= card.id %>">
-              <button type="submit" class="btn"><%= card.date %>
-              </button>
-            </form>
-            
-          </li>
+        <% if @sadhna_cards.count > 0 %>
+          <% @sadhna_cards.each do |card| %>
+            <li class="list-group-item">
+              <form action="/sadhna_cards/<%= card.id %>">
+                <button type="submit" class="btn"><%= card.date %>
+                </button>
+              </form>
+              
+            </li>
+          <% end %>
+        <% else %>
+          <li class="list-group-item"> No Sadhana Cards found for selected month </li>          
         <% end %>
 
       </ul>
@@ -77,5 +83,32 @@
       // console.log(data)
       window.location.href = "/sadhna_cards?month=" + data.month + "&year=" + data.year
     })
+
+    $("#download_link").hide()
+
+    $("#download").click(function(e){
+
+      data = {
+        month: $('#month').val(),
+        year: $('#year').val(),
+      }
+      user_id = '<%= current_user.id %>'
+      // console.log(data)
+
+      url = "/users/" + user_id + "/report?month=" + data.month + "&year=" + data.year
+      window.location = url
+
+    })
   })
 </script>
+
+<style type="text/css">
+  
+  .sc_list .btn {
+    width: 100% !important;
+  }
+
+  .add_new_sc {
+    float: right;
+  }
+</style>

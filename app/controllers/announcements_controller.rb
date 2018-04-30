@@ -1,4 +1,5 @@
 class AnnouncementsController < ApplicationController
+	skip_before_filter :require_login
 
   def index
     headers['Access-Control-Allow-Origin'] = '*'
